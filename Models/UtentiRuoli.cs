@@ -5,6 +5,8 @@ namespace Gestionale.Api.Models;
 
 public partial class UtentiRuoli
 {
+    public int Id { get; set; }
+
     public int UtenteId { get; set; }
 
     public int RuoloId { get; set; }

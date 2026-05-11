@@ -190,6 +190,55 @@
         }
       }
     },
+    "/api/AssegnazioniDpi/dipendente/{dipendenteId}": {
+      "get": {
+        "tags": [
+          "AssegnazioniDpi"
+        ],
+        "parameters": [
+          {
+            "name": "dipendenteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssegnazioneDpiListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssegnazioneDpiListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssegnazioneDpiListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/AssegnazioniMateriali": {
       "get": {
         "tags": [
@@ -560,6 +609,111 @@
         }
       }
     },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Cantieri": {
       "get": {
         "tags": [
@@ -779,6 +933,46 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Cantieri/{id}/scheda": {
+      "get": {
+        "tags": [
+          "Cantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CantiereSchedaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CantiereSchedaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CantiereSchedaDto"
+                }
+              }
+            }
           }
         }
       }
@@ -1313,6 +1507,35 @@
         }
       }
     },
+    "/api/Dipendenti/me": {
+      "get": {
+        "tags": [
+          "Dipendenti"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteDetailDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Dipendenti/{id}": {
       "get": {
         "tags": [
@@ -1407,6 +1630,366 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Dipendenti/{id}/scheda": {
+      "get": {
+        "tags": [
+          "Dipendenti"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteSchedaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteSchedaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DipendenteSchedaDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri": {
+      "get": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentoCantiereDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentoCantiereDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentoCantiereDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri/{id}": {
+      "get": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentoCantiereDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentoCantiereDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentoCantiereDetailDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentoCantiereDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentoCantiereDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentoCantiereDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri/cantiere/{cantiereId}": {
+      "get": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "cantiereId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentoCantiereListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri/{id}/download": {
+      "get": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri/{id}/open": {
+      "get": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DocumentiCantieri/upload": {
+      "post": {
+        "tags": [
+          "DocumentiCantieri"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "CantiereId",
+                  "File"
+                ],
+                "type": "object",
+                "properties": {
+                  "CantiereId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "DataDocumento": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "Note": {
+                    "maxLength": 1000,
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "CantiereId": {
+                  "style": "form"
+                },
+                "File": {
+                  "style": "form"
+                },
+                "DataDocumento": {
+                  "style": "form"
+                },
+                "Note": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -2658,6 +3241,69 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Magazzino/import-excel/preview": {
+      "post": {
+        "tags": [
+          "Magazzino"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Magazzino/import-excel/confirm": {
+      "post": {
+        "tags": [
+          "Magazzino"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfermaImportMovimentiMagazzinoDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfermaImportMovimentiMagazzinoDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfermaImportMovimentiMagazzinoDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -4024,6 +4670,82 @@
         }
       }
     },
+    "/api/StatiAssegnazione": {
+      "get": {
+        "tags": [
+          "StatiAssegnazione"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatoAssegnazioneListDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatoAssegnazioneListDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatoAssegnazioneListDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/StatiAssegnazione/attivi": {
+      "get": {
+        "tags": [
+          "StatiAssegnazione"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SelectOptionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SelectOptionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SelectOptionDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TipiDocumento": {
       "get": {
         "tags": [
@@ -5160,6 +5882,10 @@
           },
           "firmaConsegna": {
             "type": "boolean"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5412,6 +6138,30 @@
         },
         "additionalProperties": false
       },
+      "AuthLoginRequestDto": {
+        "type": "object",
+        "properties": {
+          "usernameOrEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthRefreshRequestDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CantiereDetailDto": {
         "type": "object",
         "properties": {
@@ -5419,15 +6169,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "codice": {
-            "type": "string",
-            "nullable": true
-          },
           "nome": {
-            "type": "string",
-            "nullable": true
-          },
-          "cliente": {
             "type": "string",
             "nullable": true
           },
@@ -5435,24 +6177,28 @@
             "type": "string",
             "nullable": true
           },
-          "citta": {
+          "responsabileCantiere": {
             "type": "string",
             "nullable": true
           },
-          "provincia": {
+          "direzioneLavori": {
             "type": "string",
             "nullable": true
           },
-          "cap": {
+          "committente": {
             "type": "string",
             "nullable": true
           },
-          "dataInizio": {
+          "appaltatore": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataInizioLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "dataFine": {
+          "dataPrevistaFineLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
@@ -5462,6 +6208,15 @@
           },
           "note": {
             "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         },
@@ -5474,38 +6229,57 @@
             "type": "integer",
             "format": "int32"
           },
-          "codice": {
-            "type": "string",
-            "nullable": true
-          },
           "nome": {
             "type": "string",
             "nullable": true
           },
-          "cliente": {
+          "indirizzo": {
             "type": "string",
             "nullable": true
           },
-          "citta": {
+          "responsabileCantiere": {
             "type": "string",
             "nullable": true
           },
-          "provincia": {
+          "committente": {
             "type": "string",
             "nullable": true
           },
-          "dataInizio": {
+          "dataInizioLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "dataFine": {
+          "dataPrevistaFineLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
           "attivo": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CantiereSchedaDto": {
+        "type": "object",
+        "properties": {
+          "cantiere": {
+            "$ref": "#/components/schemas/CantiereDetailDto"
+          },
+          "documenti": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentoCantiereListDto"
+            },
+            "nullable": true
+          },
+          "movimentiMateriale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovimentoMaterialeListDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5608,6 +6382,16 @@
           },
           "attivo": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfermaImportMovimentiMagazzinoDto": {
+        "type": "object",
+        "properties": {
+          "previewToken": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5774,40 +6558,42 @@
         ],
         "type": "object",
         "properties": {
-          "codice": {
-            "type": "string",
-            "nullable": true
-          },
           "nome": {
+            "maxLength": 200,
             "minLength": 1,
             "type": "string"
           },
-          "cliente": {
-            "type": "string",
-            "nullable": true
-          },
           "indirizzo": {
+            "maxLength": 255,
             "type": "string",
             "nullable": true
           },
-          "citta": {
+          "responsabileCantiere": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "provincia": {
+          "direzioneLavori": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "cap": {
+          "committente": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "dataInizio": {
+          "appaltatore": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "dataInizioLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "dataFine": {
+          "dataPrevistaFineLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
@@ -5816,6 +6602,7 @@
             "type": "boolean"
           },
           "note": {
+            "maxLength": 1000,
             "type": "string",
             "nullable": true
           }
@@ -5937,6 +6724,51 @@
             "type": "boolean"
           },
           "note": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateDocumentoCantiereDto": {
+        "required": [
+          "cantiereId",
+          "nomeFile",
+          "percorsoFile"
+        ],
+        "type": "object",
+        "properties": {
+          "cantiereId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nomeFile": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "percorsoFile": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "estensione": {
+            "maxLength": 20,
+            "type": "string",
+            "nullable": true
+          },
+          "contentType": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "dataDocumento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "note": {
+            "maxLength": 1000,
             "type": "string",
             "nullable": true
           }
@@ -6081,6 +6913,17 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "quantitaDisponibile": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantitaMinima": {
+            "type": "number",
+            "format": "double"
+          },
+          "richiedeTaglia": {
+            "type": "boolean"
           },
           "haScadenza": {
             "type": "boolean"
@@ -6283,6 +7126,10 @@
           "fornitoreId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "tipoPossesso": {
+            "type": "string",
             "nullable": true
           },
           "attivo": {
@@ -6601,6 +7448,36 @@
         },
         "additionalProperties": false
       },
+      "DipendenteSchedaDto": {
+        "type": "object",
+        "properties": {
+          "dipendente": {
+            "$ref": "#/components/schemas/DipendenteDetailDto"
+          },
+          "documenti": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentoDipendenteListDto"
+            },
+            "nullable": true
+          },
+          "visiteMediche": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VisitaMedicaListDto"
+            },
+            "nullable": true
+          },
+          "dpiAssegnati": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssegnazioneDpiListDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DipendenteSelectDto": {
         "type": "object",
         "properties": {
@@ -6614,6 +7491,97 @@
           },
           "nomeCompleto": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentoCantiereDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantiereId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantiere": {
+            "type": "string",
+            "nullable": true
+          },
+          "nomeFile": {
+            "type": "string",
+            "nullable": true
+          },
+          "percorsoFile": {
+            "type": "string",
+            "nullable": true
+          },
+          "estensione": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentType": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataDocumento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentoCantiereListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantiereId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantiere": {
+            "type": "string",
+            "nullable": true
+          },
+          "nomeFile": {
+            "type": "string",
+            "nullable": true
+          },
+          "percorsoFile": {
+            "type": "string",
+            "nullable": true
+          },
+          "estensione": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentType": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataDocumento": {
+            "type": "string",
+            "format": "date",
             "nullable": true
           }
         },
@@ -7053,6 +8021,17 @@
             "format": "int32",
             "nullable": true
           },
+          "quantitaDisponibile": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantitaMinima": {
+            "type": "number",
+            "format": "double"
+          },
+          "richiedeTaglia": {
+            "type": "boolean"
+          },
           "haScadenza": {
             "type": "boolean"
           },
@@ -7119,6 +8098,17 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "quantitaDisponibile": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantitaMinima": {
+            "type": "number",
+            "format": "double"
+          },
+          "richiedeTaglia": {
+            "type": "boolean"
           },
           "haScadenza": {
             "type": "boolean"
@@ -7540,6 +8530,10 @@
             "format": "int32",
             "nullable": true
           },
+          "tipoPossesso": {
+            "type": "string",
+            "nullable": true
+          },
           "attivo": {
             "type": "boolean"
           },
@@ -7613,6 +8607,10 @@
             "nullable": true
           },
           "fornitore": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoPossesso": {
             "type": "string",
             "nullable": true
           },
@@ -7862,6 +8860,27 @@
           "nome": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatoAssegnazioneListDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nome": {
+            "type": "string",
+            "nullable": true
+          },
+          "descrizione": {
+            "type": "string",
+            "nullable": true
+          },
+          "attivo": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -8263,40 +9282,42 @@
         ],
         "type": "object",
         "properties": {
-          "codice": {
-            "type": "string",
-            "nullable": true
-          },
           "nome": {
+            "maxLength": 200,
             "minLength": 1,
             "type": "string"
           },
-          "cliente": {
-            "type": "string",
-            "nullable": true
-          },
           "indirizzo": {
+            "maxLength": 255,
             "type": "string",
             "nullable": true
           },
-          "citta": {
+          "responsabileCantiere": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "provincia": {
+          "direzioneLavori": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "cap": {
+          "committente": {
+            "maxLength": 200,
             "type": "string",
             "nullable": true
           },
-          "dataInizio": {
+          "appaltatore": {
+            "maxLength": 200,
+            "type": "string",
+            "nullable": true
+          },
+          "dataInizioLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "dataFine": {
+          "dataPrevistaFineLavori": {
             "type": "string",
             "format": "date",
             "nullable": true
@@ -8305,6 +9326,7 @@
             "type": "boolean"
           },
           "note": {
+            "maxLength": 1000,
             "type": "string",
             "nullable": true
           }
@@ -8426,6 +9448,51 @@
             "type": "boolean"
           },
           "note": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateDocumentoCantiereDto": {
+        "required": [
+          "cantiereId",
+          "nomeFile",
+          "percorsoFile"
+        ],
+        "type": "object",
+        "properties": {
+          "cantiereId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nomeFile": {
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "percorsoFile": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "estensione": {
+            "maxLength": 20,
+            "type": "string",
+            "nullable": true
+          },
+          "contentType": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "dataDocumento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "note": {
+            "maxLength": 1000,
             "type": "string",
             "nullable": true
           }
@@ -8570,6 +9637,17 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "quantitaDisponibile": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantitaMinima": {
+            "type": "number",
+            "format": "double"
+          },
+          "richiedeTaglia": {
+            "type": "boolean"
           },
           "haScadenza": {
             "type": "boolean"
@@ -8772,6 +9850,10 @@
           "fornitoreId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "tipoPossesso": {
+            "type": "string",
             "nullable": true
           },
           "attivo": {
@@ -9137,6 +10219,9 @@
       "name": "AssegnazioniMezzi"
     },
     {
+      "name": "Auth"
+    },
+    {
       "name": "Cantieri"
     },
     {
@@ -9147,6 +10232,9 @@
     },
     {
       "name": "Dipendenti"
+    },
+    {
+      "name": "DocumentiCantieri"
     },
     {
       "name": "DocumentiDipendenti"
@@ -9174,6 +10262,9 @@
     },
     {
       "name": "MovimentiMateriale"
+    },
+    {
+      "name": "StatiAssegnazione"
     },
     {
       "name": "TipiDocumento"

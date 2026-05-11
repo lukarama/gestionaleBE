@@ -36,6 +36,9 @@ namespace Gestionale.Api.Services
                     FornitoreId = d.FornitoreId,
                     Fornitore = d.Fornitore != null ? d.Fornitore.RagioneSociale : null,
                     DurataGiorni = d.DurataGiorni,
+                    QuantitaDisponibile = d.QuantitaDisponibile,
+                    QuantitaMinima = d.QuantitaMinima,
+                    RichiedeTaglia = d.RichiedeTaglia,
                     HaScadenza = d.HaScadenza,
                     Attivo = d.Attivo
                 })
@@ -76,6 +79,9 @@ namespace Gestionale.Api.Services
                     FornitoreId = d.FornitoreId,
                     Fornitore = d.Fornitore != null ? d.Fornitore.RagioneSociale : null,
                     DurataGiorni = d.DurataGiorni,
+                    QuantitaDisponibile = d.QuantitaDisponibile,
+                    QuantitaMinima = d.QuantitaMinima,
+                    RichiedeTaglia = d.RichiedeTaglia,
                     HaScadenza = d.HaScadenza,
                     Attivo = d.Attivo,
                     Note = d.Note
@@ -85,6 +91,12 @@ namespace Gestionale.Api.Services
 
         public async Task<ServiceResult<DpiDetailDto>> CreateAsync(CreateDpiDto dto)
         {
+            if (dto.QuantitaDisponibile < 0)
+                return ServiceResult<DpiDetailDto>.Fail("La quantità disponibile non può essere negativa.", 400);
+
+            if (dto.QuantitaMinima < 0)
+                return ServiceResult<DpiDetailDto>.Fail("La quantità minima non può essere negativa.", 400);
+
             var validazioneRelazioni = await ValidaRelazioniAsync(dto.CategoriaDpiId, dto.FornitoreId);
             if (!validazioneRelazioni.Success)
                 return ServiceResult<DpiDetailDto>.Fail(validazioneRelazioni.Message!, validazioneRelazioni.StatusCode ?? 400);
@@ -105,6 +117,9 @@ namespace Gestionale.Api.Services
                 Barcode = Pulisci(dto.Barcode),
                 FornitoreId = dto.FornitoreId,
                 DurataGiorni = dto.DurataGiorni,
+                QuantitaDisponibile = dto.QuantitaDisponibile,
+                QuantitaMinima = dto.QuantitaMinima,
+                RichiedeTaglia = dto.RichiedeTaglia,
                 HaScadenza = dto.HaScadenza,
                 Attivo = dto.Attivo,
                 Note = Pulisci(dto.Note),
@@ -126,6 +141,12 @@ namespace Gestionale.Api.Services
             if (dpi == null)
                 return ServiceResult<bool>.Fail("DPI non trovato.", 404);
 
+            if (dto.QuantitaDisponibile < 0)
+                return ServiceResult<bool>.Fail("La quantità disponibile non può essere negativa.", 400);
+
+            if (dto.QuantitaMinima < 0)
+                return ServiceResult<bool>.Fail("La quantità minima non può essere negativa.", 400);
+
             var validazioneRelazioni = await ValidaRelazioniAsync(dto.CategoriaDpiId, dto.FornitoreId);
             if (!validazioneRelazioni.Success)
                 return ServiceResult<bool>.Fail(validazioneRelazioni.Message!, validazioneRelazioni.StatusCode ?? 400);
@@ -144,6 +165,9 @@ namespace Gestionale.Api.Services
             dpi.Barcode = Pulisci(dto.Barcode);
             dpi.FornitoreId = dto.FornitoreId;
             dpi.DurataGiorni = dto.DurataGiorni;
+            dpi.QuantitaDisponibile = dto.QuantitaDisponibile;
+            dpi.QuantitaMinima = dto.QuantitaMinima;
+            dpi.RichiedeTaglia = dto.RichiedeTaglia;
             dpi.HaScadenza = dto.HaScadenza;
             dpi.Attivo = dto.Attivo;
             dpi.Note = Pulisci(dto.Note);

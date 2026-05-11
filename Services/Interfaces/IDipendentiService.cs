@@ -7,6 +7,7 @@ namespace Gestionale.Api.Services.Interfaces
     {
         Task<List<DipendenteListDto>> GetAllAsync();
         Task<DipendenteDetailDto?> GetByIdAsync(int id);
+        Task<DipendenteSchedaDto?> GetSchedaAsync(int id);
         Task<ServiceResult<DipendenteDetailDto>> CreateAsync(CreateDipendenteDto dto);
         Task<ServiceResult<bool>> UpdateAsync(int id, UpdateDipendenteDto dto);
         Task<ServiceResult<bool>> DeleteAsync(int id);

@@ -17,5 +17,7 @@ public partial class Ruoli
 
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual ICollection<RuoliPermessi> RuoliPermessis { get; set; } = new List<RuoliPermessi>();
+
     public virtual ICollection<UtentiRuoli> UtentiRuolis { get; set; } = new List<UtentiRuoli>();
 }

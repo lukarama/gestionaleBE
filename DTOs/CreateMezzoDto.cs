@@ -15,6 +15,7 @@
         public DateOnly? DataScadenzaAssicurazione { get; set; }
         public DateOnly? DataTagliando { get; set; }
         public int? FornitoreId { get; set; }
+        public string? TipoPossesso { get; set; }
         public bool Attivo { get; set; } = true;
         public string? Note { get; set; }
     }

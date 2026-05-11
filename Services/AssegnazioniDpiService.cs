@@ -39,7 +39,8 @@ namespace Gestionale.Api.Services
                     DataConsegna = a.DataConsegna,
                     DataScadenza = a.DataScadenza,
                     DataRestituzione = a.DataRestituzione,
-                    FirmaConsegna = a.FirmaConsegna
+                    FirmaConsegna = a.FirmaConsegna,
+                    Note = a.Note
                 })
                 .ToListAsync();
         }
@@ -71,6 +72,38 @@ namespace Gestionale.Api.Services
                     Note = a.Note
                 })
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<AssegnazioneDpiListDto>> GetByDipendenteIdAsync(int dipendenteId)
+        {
+            return await _context.AssegnazioniDpis
+                .AsNoTracking()
+                .Include(a => a.Dipendente)
+                .Include(a => a.Dpi)
+                .Include(a => a.Cantiere)
+                .Include(a => a.StatoAssegnazione)
+                .Where(a => a.DipendenteId == dipendenteId)
+                .OrderByDescending(a => a.DataConsegna)
+                .ThenByDescending(a => a.Id)
+                .Select(a => new AssegnazioneDpiListDto
+                {
+                    Id = a.Id,
+                    DipendenteId = a.DipendenteId,
+                    Dipendente = a.Dipendente.Cognome + " " + a.Dipendente.Nome,
+                    DpiId = a.DpiId,
+                    Dpi = a.Dpi.Nome,
+                    CantiereId = a.CantiereId,
+                    Cantiere = a.Cantiere != null ? a.Cantiere.Nome : null,
+                    Quantita = a.Quantita,
+                    StatoAssegnazioneId = a.StatoAssegnazioneId,
+                    StatoAssegnazione = a.StatoAssegnazione.Nome,
+                    DataConsegna = a.DataConsegna,
+                    DataScadenza = a.DataScadenza,
+                    DataRestituzione = a.DataRestituzione,
+                    FirmaConsegna = a.FirmaConsegna,
+                    Note = a.Note
+                })
+                .ToListAsync();
         }
 
         public async Task<ServiceResult<AssegnazioneDpiDetailDto>> CreateAsync(CreateAssegnazioneDpiDto dto)

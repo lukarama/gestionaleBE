@@ -35,6 +35,10 @@ public partial class Dipendenti
 
     public DateOnly? DataCessazione { get; set; }
 
+    public bool HaPatente { get; set; }
+
+    public string? CategoriaPatente { get; set; }
+
     public int? MansioneId { get; set; }
 
     public bool Attivo { get; set; }
@@ -51,11 +55,23 @@ public partial class Dipendenti
 
     public virtual ICollection<AssegnazioniMezzi> AssegnazioniMezzis { get; set; } = new List<AssegnazioniMezzi>();
 
+    public virtual ICollection<Assenza> Assenze { get; set; } = new List<Assenza>();
+
+    public virtual ICollection<CartelleDocumentiDipendenti> CartelleDocumentiDipendentis { get; set; } = new List<CartelleDocumentiDipendenti>();
+
     public virtual ICollection<DocumentiDipendenti> DocumentiDipendentis { get; set; } = new List<DocumentiDipendenti>();
+
+    public virtual ICollection<ExpenseRequest> ExpenseRequests { get; set; } = new List<ExpenseRequest>();
+
+    public virtual ICollection<IssueReport> IssueReports { get; set; } = new List<IssueReport>();
 
     public virtual Mansioni? Mansione { get; set; }
 
+    public virtual ICollection<MaterialRequest> MaterialRequests { get; set; } = new List<MaterialRequest>();
+
     public virtual ICollection<MovimentiMateriale> MovimentiMateriales { get; set; } = new List<MovimentiMateriale>();
+
+    public virtual ICollection<Utenti> Utentis { get; set; } = new List<Utenti>();
 
     public virtual ICollection<VisiteMediche> VisiteMediches { get; set; } = new List<VisiteMediche>();
 }

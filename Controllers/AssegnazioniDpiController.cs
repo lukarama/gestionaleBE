@@ -33,6 +33,13 @@ namespace Gestionale.Api.Controllers
             return Ok(assegnazione);
         }
 
+        [HttpGet("dipendente/{dipendenteId}")]
+        public async Task<ActionResult<IEnumerable<AssegnazioneDpiListDto>>> GetByDipendenteId(int dipendenteId)
+        {
+            var assegnazioni = await _assegnazioniDpiService.GetByDipendenteIdAsync(dipendenteId);
+            return Ok(assegnazioni);
+        }
+
         [HttpPost]
         public async Task<ActionResult<AssegnazioneDpiDetailDto>> Create(CreateAssegnazioneDpiDto dto)
         {

@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+out/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Runtime and logs
+Logs/
+*.log
+run*.log
+
+# Local generated data
+Documenti/
+_runtime_logs/
+_verify_build*/
+_verify_obj/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -18,6 +18,7 @@
 
         public int? FornitoreId { get; set; }
         public string? Fornitore { get; set; }
+        public string? TipoPossesso { get; set; }
 
         public bool Attivo { get; set; }
     }

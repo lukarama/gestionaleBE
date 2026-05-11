@@ -6,11 +6,16 @@ namespace Gestionale.Api.Common
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly IWebHostEnvironment _environment;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(
+            RequestDelegate next,
+            ILogger<ExceptionMiddleware> logger,
+            IWebHostEnvironment environment)
         {
             _next = next;
             _logger = logger;
+            _environment = environment;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -29,7 +34,8 @@ namespace Gestionale.Api.Common
                 var response = new ApiErrorResponse
                 {
                     Message = "Si è verificato un errore interno del server.",
-                    Detail = ex.Message
+                    Detail = _environment.IsDevelopment() ? ex.Message : null,
+                    TraceId = context.TraceIdentifier
                 };
 
                 var json = JsonSerializer.Serialize(response);

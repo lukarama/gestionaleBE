@@ -7,6 +7,7 @@ namespace Gestionale.Api.Services.Interfaces
     {
         Task<List<AssegnazioneDpiListDto>> GetAllAsync();
         Task<AssegnazioneDpiDetailDto?> GetByIdAsync(int id);
+        Task<List<AssegnazioneDpiListDto>> GetByDipendenteIdAsync(int dipendenteId);
         Task<ServiceResult<AssegnazioneDpiDetailDto>> CreateAsync(CreateAssegnazioneDpiDto dto);
         Task<ServiceResult<bool>> UpdateAsync(int id, UpdateAssegnazioneDpiDto dto);
         Task<ServiceResult<bool>> DeleteAsync(int id);

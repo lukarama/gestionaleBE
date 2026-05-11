@@ -5,6 +5,7 @@ namespace Gestionale.Api.DTOs;
 public class UploadDocumentoDipendenteDto
 {
     public int DipendenteId { get; set; }
+    public int? CartellaId { get; set; }
     public int? TipoDocumentoId { get; set; }
     public DateOnly? DataDocumento { get; set; }
     public DateOnly? DataScadenza { get; set; }

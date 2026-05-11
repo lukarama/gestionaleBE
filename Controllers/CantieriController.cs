@@ -42,6 +42,19 @@ namespace Gestionale.Api.Controllers
             return Ok(cantiere);
         }
 
+        [HttpGet("{id}/scheda")]
+        public async Task<ActionResult<CantiereSchedaDto>> GetScheda(int id)
+        {
+            var cantiere = await _cantieriService.GetSchedaAsync(id);
+
+            if (cantiere == null)
+            {
+                return NotFound(new { message = "Cantiere non trovato" });
+            }
+
+            return Ok(cantiere);
+        }
+
         [HttpPost]
         public async Task<ActionResult<CantiereDetailDto>> Create(CreateCantiereDto dto)
         {

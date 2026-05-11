@@ -23,5 +23,6 @@
         public DateOnly? DataRestituzione { get; set; }
 
         public bool FirmaConsegna { get; set; }
+        public string? Note { get; set; }
     }
 }

@@ -9,6 +9,9 @@ namespace Gestionale.Api.Services
 {
     public class MezziService : IMezziService
     {
+        private const string TipoPossessoNoleggio = "noleggio";
+        private const string TipoPossessoProprieta = "proprieta";
+
         private readonly AppDbContext _context;
 
         public MezziService(AppDbContext context)
@@ -40,6 +43,7 @@ namespace Gestionale.Api.Services
                     TipologiaMezzo = m.TipologiaMezzo != null ? m.TipologiaMezzo.Nome : null,
                     FornitoreId = m.FornitoreId,
                     Fornitore = m.Fornitore != null ? m.Fornitore.RagioneSociale : null,
+                    TipoPossesso = m.TipoPossesso,
                     Attivo = m.Attivo
                 })
                 .ToListAsync();
@@ -113,6 +117,7 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
                     DataScadenzaAssicurazione = m.DataScadenzaAssicurazione,
                     DataTagliando = m.DataTagliando,
                     FornitoreId = m.FornitoreId,
+                    TipoPossesso = m.TipoPossesso,
                     Attivo = m.Attivo,
                     Note = m.Note
                 })
@@ -129,6 +134,10 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
             if (!validazioneDuplicati.Success)
                 return ServiceResult<MezzoDetailDto>.Fail(validazioneDuplicati.Message!, validazioneDuplicati.StatusCode ?? 400);
 
+            var tipoPossessoNormalizzato = NormalizzaTipoPossesso(dto.TipoPossesso);
+            if (dto.TipoPossesso is not null && tipoPossessoNormalizzato is null)
+                return ServiceResult<MezzoDetailDto>.Fail("Il tipo di possesso deve essere 'noleggio' o 'proprieta'.", 400);
+
             var mezzo = new Mezzi
             {
                 Targa = Pulisci(dto.Targa),
@@ -144,6 +153,7 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
                 DataScadenzaAssicurazione = dto.DataScadenzaAssicurazione,
                 DataTagliando = dto.DataTagliando,
                 FornitoreId = dto.FornitoreId,
+                TipoPossesso = tipoPossessoNormalizzato,
                 Attivo = dto.Attivo,
                 Note = Pulisci(dto.Note),
                 CreatedAt = DateTime.Now,
@@ -172,6 +182,10 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
             if (!validazioneDuplicati.Success)
                 return ServiceResult<bool>.Fail(validazioneDuplicati.Message!, validazioneDuplicati.StatusCode ?? 400);
 
+            var tipoPossessoNormalizzato = NormalizzaTipoPossesso(dto.TipoPossesso);
+            if (dto.TipoPossesso is not null && tipoPossessoNormalizzato is null)
+                return ServiceResult<bool>.Fail("Il tipo di possesso deve essere 'noleggio' o 'proprieta'.", 400);
+
             mezzo.Targa = Pulisci(dto.Targa);
             mezzo.NumeroTelaio = Pulisci(dto.NumeroTelaio);
             mezzo.CodiceInterno = Pulisci(dto.CodiceInterno);
@@ -185,6 +199,7 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
             mezzo.DataScadenzaAssicurazione = dto.DataScadenzaAssicurazione;
             mezzo.DataTagliando = dto.DataTagliando;
             mezzo.FornitoreId = dto.FornitoreId;
+            mezzo.TipoPossesso = tipoPossessoNormalizzato;
             mezzo.Attivo = dto.Attivo;
             mezzo.Note = Pulisci(dto.Note);
             mezzo.UpdatedAt = DateTime.Now;
@@ -284,6 +299,21 @@ public async Task<List<ScadenzaMezzoDashboardDto>> GetDashboardScadenzeNativeAsy
         private static string? Pulisci(string? valore)
         {
             return string.IsNullOrWhiteSpace(valore) ? null : valore.Trim();
+        }
+
+        private static string? NormalizzaTipoPossesso(string? valore)
+        {
+            var valorePulito = Pulisci(valore);
+            if (valorePulito is null)
+                return null;
+
+            return valorePulito.ToLowerInvariant() switch
+            {
+                TipoPossessoNoleggio => TipoPossessoNoleggio,
+                "proprieta" => TipoPossessoProprieta,
+                "proprietà" => TipoPossessoProprieta,
+                _ => null
+            };
         }
 
         private static void AggiungiScadenzaSeValida(

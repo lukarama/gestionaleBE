@@ -3,6 +3,7 @@
 public class UpdateDocumentoDipendenteDto
 {
     public int DipendenteId { get; set; }
+    public int? CartellaId { get; set; }
     public int? TipoDocumentoId { get; set; }
     public string NomeFile { get; set; } = null!;
     public string PercorsoFile { get; set; } = null!;

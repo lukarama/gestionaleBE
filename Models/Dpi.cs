@@ -27,6 +27,12 @@ public partial class Dpi
 
     public int? DurataGiorni { get; set; }
 
+    public decimal QuantitaDisponibile { get; set; }
+
+    public decimal QuantitaMinima { get; set; }
+
+    public bool RichiedeTaglia { get; set; }
+
     public bool HaScadenza { get; set; }
 
     public bool Attivo { get; set; }

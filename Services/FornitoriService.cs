@@ -69,6 +69,12 @@ namespace Gestionale.Api.Services
         public async Task<ServiceResult<FornitoreDetailDto>> CreateAsync(CreateFornitoreDto dto)
         {
             var ragioneSocialePulita = dto.RagioneSociale.Trim();
+            var partitaIvaPulita = NormalizzaPartitaIva(dto.PartitaIva);
+
+            if (partitaIvaPulita == string.Empty)
+            {
+                return ServiceResult<FornitoreDetailDto>.Fail("La partita IVA deve contenere 11 cifre, con prefisso IT opzionale.", 400);
+            }
 
             var esisteGia = await _context.Fornitoris
                 .AnyAsync(f => f.RagioneSociale == ragioneSocialePulita);
@@ -78,10 +84,21 @@ namespace Gestionale.Api.Services
                 return ServiceResult<FornitoreDetailDto>.Fail("Esiste già un fornitore con questa ragione sociale.", 400);
             }
 
+            if (partitaIvaPulita != null)
+            {
+                var partitaIvaEsistente = await _context.Fornitoris
+                    .AnyAsync(f => f.PartitaIva == partitaIvaPulita);
+
+                if (partitaIvaEsistente)
+                {
+                    return ServiceResult<FornitoreDetailDto>.Fail("Esiste già un fornitore con questa partita IVA.", 400);
+                }
+            }
+
             var fornitore = new Fornitori
             {
                 RagioneSociale = ragioneSocialePulita,
-                PartitaIva = Pulisci(dto.PartitaIva),
+                PartitaIva = partitaIvaPulita,
                 CodiceFiscale = Pulisci(dto.CodiceFiscale),
                 Telefono = Pulisci(dto.Telefono),
                 Email = Pulisci(dto.Email),
@@ -128,6 +145,12 @@ namespace Gestionale.Api.Services
             }
 
             var ragioneSocialePulita = dto.RagioneSociale.Trim();
+            var partitaIvaPulita = NormalizzaPartitaIva(dto.PartitaIva);
+
+            if (partitaIvaPulita == string.Empty)
+            {
+                return ServiceResult<bool>.Fail("La partita IVA deve contenere 11 cifre, con prefisso IT opzionale.", 400);
+            }
 
             var esisteGia = await _context.Fornitoris
                 .AnyAsync(f => f.Id != id && f.RagioneSociale == ragioneSocialePulita);
@@ -137,8 +160,19 @@ namespace Gestionale.Api.Services
                 return ServiceResult<bool>.Fail("Esiste già un altro fornitore con questa ragione sociale.", 400);
             }
 
+            if (partitaIvaPulita != null)
+            {
+                var partitaIvaEsistente = await _context.Fornitoris
+                    .AnyAsync(f => f.Id != id && f.PartitaIva == partitaIvaPulita);
+
+                if (partitaIvaEsistente)
+                {
+                    return ServiceResult<bool>.Fail("Esiste già un altro fornitore con questa partita IVA.", 400);
+                }
+            }
+
             fornitore.RagioneSociale = ragioneSocialePulita;
-            fornitore.PartitaIva = Pulisci(dto.PartitaIva);
+            fornitore.PartitaIva = partitaIvaPulita;
             fornitore.CodiceFiscale = Pulisci(dto.CodiceFiscale);
             fornitore.Telefono = Pulisci(dto.Telefono);
             fornitore.Email = Pulisci(dto.Email);
@@ -183,6 +217,30 @@ namespace Gestionale.Api.Services
         private static string? Pulisci(string? valore)
         {
             return string.IsNullOrWhiteSpace(valore) ? null : valore.Trim();
+        }
+
+        private static string? NormalizzaPartitaIva(string? valore)
+        {
+            var pulita = Pulisci(valore);
+
+            if (pulita == null)
+            {
+                return null;
+            }
+
+            pulita = pulita.Replace(" ", string.Empty)
+                .Replace(".", string.Empty)
+                .Replace("-", string.Empty)
+                .ToUpperInvariant();
+
+            if (pulita.StartsWith("IT"))
+            {
+                pulita = pulita[2..];
+            }
+
+            return pulita.Length == 11 && pulita.All(char.IsDigit)
+                ? pulita
+                : string.Empty;
         }
     }
 }

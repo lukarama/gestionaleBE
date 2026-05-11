@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Gestionale.Api.Models;
+using Gestionale.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gestionale.Api.Data;
@@ -22,19 +23,29 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<AssegnazioniMezzi> AssegnazioniMezzis { get; set; }
 
+    public virtual DbSet<Assenza> Assenze { get; set; }
+
     public virtual DbSet<Cantieri> Cantieris { get; set; }
 
     public virtual DbSet<CategorieDpi> CategorieDpis { get; set; }
 
     public virtual DbSet<CategorieMateriale> CategorieMateriales { get; set; }
 
+    public virtual DbSet<CartelleDocumentiDipendenti> CartelleDocumentiDipendentis { get; set; }
+
     public virtual DbSet<Dipendenti> Dipendentis { get; set; }
+
+    public virtual DbSet<DocumentiCantieri> DocumentiCantieris { get; set; }
 
     public virtual DbSet<DocumentiDipendenti> DocumentiDipendentis { get; set; }
 
     public virtual DbSet<DocumentiMezzi> DocumentiMezzis { get; set; }
 
     public virtual DbSet<Dpi> Dpis { get; set; }
+
+    public virtual DbSet<ExpenseRequest> ExpenseRequests { get; set; }
+
+    public virtual DbSet<IssueReport> IssueReports { get; set; }
 
     public virtual DbSet<EsitiVisitaMedica> EsitiVisitaMedicas { get; set; }
 
@@ -44,13 +55,23 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Materiali> Materialis { get; set; }
 
+    public virtual DbSet<MaterialRequest> MaterialRequests { get; set; }
+
     public virtual DbSet<Mezzi> Mezzis { get; set; }
 
     public virtual DbSet<MovimentiMateriale> MovimentiMateriales { get; set; }
 
+    public virtual DbSet<Permessi> Permessis { get; set; }
+
+    public virtual DbSet<RefreshTokens> RefreshTokens { get; set; }
+
     public virtual DbSet<Ruoli> Ruolis { get; set; }
 
+    public virtual DbSet<RuoliPermessi> RuoliPermessis { get; set; }
+
     public virtual DbSet<StatiAssegnazione> StatiAssegnaziones { get; set; }
+
+    public virtual DbSet<TipoAssenza> TipiAssenza { get; set; }
 
     public virtual DbSet<TipiDocumento> TipiDocumentos { get; set; }
 
@@ -64,11 +85,9 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<UtentiRuoli> UtentiRuolis { get; set; }
 
-    public virtual DbSet<VisiteMediche> VisiteMediches { get; set; }
+    public virtual DbSet<UtentiVisibilita> UtentiVisibilitas { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost\\GESTIONALE;Database=GestionaleAziendale;Trusted_Connection=True;TrustServerCertificate=True;");
+    public virtual DbSet<VisiteMediche> VisiteMediches { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -183,6 +202,45 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_AssegnazioniMezzi_StatiAssegnazione");
         });
 
+        modelBuilder.Entity<Assenza>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Assenze");
+
+            entity.ToTable("Assenze");
+
+            entity.HasIndex(e => e.DipendenteId, "IX_Assenze_DipendenteId");
+
+            entity.HasIndex(e => e.TipoAssenzaId, "IX_Assenze_TipoAssenzaId");
+
+            entity.HasIndex(e => e.Stato, "IX_Assenze_Stato");
+
+            entity.HasIndex(e => e.DataRichiesta, "IX_Assenze_DataRichiesta");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())", "DF_Assenze_CreatedAt");
+            entity.Property(e => e.DataRichiesta).HasDefaultValueSql("(sysutcdatetime())", "DF_Assenze_DataRichiesta");
+            entity.Property(e => e.Note).HasMaxLength(1000);
+            entity.Property(e => e.Stato)
+                .HasMaxLength(30)
+                .HasDefaultValue("richiesto", "DF_Assenze_Stato");
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_Assenze_DataFine_DataInizio", "[DataFine] >= [DataInizio]");
+                t.HasCheckConstraint("CK_Assenze_Giorni", "[Giorni] > 0");
+                t.HasCheckConstraint("CK_Assenze_Stato", "[Stato] IN (N'richiesto', N'approvato', N'rimandato', N'rifiutato')");
+            });
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.Assenze)
+                .HasForeignKey(d => d.DipendenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Assenze_Dipendenti");
+
+            entity.HasOne(d => d.TipoAssenza).WithMany(p => p.Assenze)
+                .HasForeignKey(d => d.TipoAssenzaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Assenze_TipiAssenza");
+        });
+
         modelBuilder.Entity<Cantieri>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Cantieri__3214EC078EDC8A94");
@@ -191,20 +249,36 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Nome, "IX_Cantieri_Nome");
 
-            entity.HasIndex(e => e.Codice, "UX_Cantieri_Codice")
-                .IsUnique()
-                .HasFilter("([Codice] IS NOT NULL)");
-
             entity.Property(e => e.Attivo).HasDefaultValue(true, "DF_Cantieri_Attivo");
-            entity.Property(e => e.Cap).HasMaxLength(5);
-            entity.Property(e => e.Citta).HasMaxLength(100);
-            entity.Property(e => e.Cliente).HasMaxLength(200);
-            entity.Property(e => e.Codice).HasMaxLength(50);
+            entity.Property(e => e.Appaltatore).HasMaxLength(200);
+            entity.Property(e => e.Committente).HasMaxLength(200);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_Cantieri_CreatedAt");
+            entity.Property(e => e.DirezioneLavori).HasMaxLength(200);
             entity.Property(e => e.Indirizzo).HasMaxLength(255);
             entity.Property(e => e.Nome).HasMaxLength(200);
             entity.Property(e => e.Note).HasMaxLength(1000);
-            entity.Property(e => e.Provincia).HasMaxLength(2);
+            entity.Property(e => e.ResponsabileCantiere).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<DocumentiCantieri>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07CANTIERE");
+
+            entity.ToTable("DocumentiCantieri");
+
+            entity.HasIndex(e => e.CantiereId, "IX_DocumentiCantieri_CantiereId");
+
+            entity.Property(e => e.ContentType).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_DocumentiCantieri_CreatedAt");
+            entity.Property(e => e.Estensione).HasMaxLength(20);
+            entity.Property(e => e.NomeFile).HasMaxLength(255);
+            entity.Property(e => e.Note).HasMaxLength(1000);
+            entity.Property(e => e.PercorsoFile).HasMaxLength(500);
+
+            entity.HasOne(d => d.Cantiere).WithMany(p => p.DocumentiCantieris)
+                .HasForeignKey(d => d.CantiereId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DocumentiCantieri_Cantieri");
         });
 
         modelBuilder.Entity<CategorieDpi>(entity =>
@@ -235,6 +309,43 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Nome).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<CartelleDocumentiDipendenti>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_CartelleDocumentiDipendenti");
+
+            entity.ToTable("CartelleDocumentiDipendenti");
+
+            entity.HasIndex(e => e.DipendenteId, "IX_CartelleDocumentiDipendenti_DipendenteId");
+
+            entity.HasIndex(e => e.ParentCartellaId, "IX_CartelleDocumentiDipendenti_ParentCartellaId");
+
+            entity.HasIndex(e => e.CreatedByUtenteId, "IX_CartelleDocumentiDipendenti_CreatedByUtenteId");
+
+            entity.HasIndex(e => new { e.DipendenteId, e.ParentCartellaId, e.Nome }, "UX_CartelleDocumentiDipendenti_Dipendente_Parent_Nome")
+                .IsUnique()
+                .HasFilter("[ParentCartellaId] IS NOT NULL");
+
+            entity.HasIndex(e => new { e.DipendenteId, e.Nome }, "UX_CartelleDocumentiDipendenti_Dipendente_Nome_Root")
+                .IsUnique()
+                .HasFilter("[ParentCartellaId] IS NULL");
+
+            entity.Property(e => e.Nome).HasMaxLength(150);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_CartelleDocumentiDipendenti_CreatedAt");
+
+            entity.HasOne(d => d.CreatedByUtente).WithMany(p => p.CartelleDocumentiDipendentiCreatedByUtentes)
+                .HasForeignKey(d => d.CreatedByUtenteId)
+                .HasConstraintName("FK_CartelleDocumentiDipendenti_Utenti_CreatedBy");
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.CartelleDocumentiDipendentis)
+                .HasForeignKey(d => d.DipendenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CartelleDocumentiDipendenti_Dipendenti");
+
+            entity.HasOne(d => d.ParentCartella).WithMany(p => p.InverseParentCartella)
+                .HasForeignKey(d => d.ParentCartellaId)
+                .HasConstraintName("FK_CartelleDocumentiDipendenti_Parent");
+        });
+
         modelBuilder.Entity<Dipendenti>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Dipenden__3214EC079E4CF650");
@@ -257,7 +368,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CodiceFiscale).HasMaxLength(16);
             entity.Property(e => e.Cognome).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_Dipendenti_CreatedAt");
+            entity.Property(e => e.CategoriaPatente).HasMaxLength(20);
             entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.HaPatente).HasDefaultValue(false, "DF_Dipendenti_HaPatente");
             entity.Property(e => e.Indirizzo).HasMaxLength(255);
             entity.Property(e => e.LuogoNascita).HasMaxLength(150);
             entity.Property(e => e.Matricola).HasMaxLength(50);
@@ -281,12 +394,22 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.DipendenteId, "IX_DocumentiDipendenti_DipendenteId");
 
+            entity.HasIndex(e => e.CartellaId, "IX_DocumentiDipendenti_CartellaId");
+
+            entity.HasIndex(e => e.UploadedByUtenteId, "IX_DocumentiDipendenti_UploadedByUtenteId");
+
             entity.Property(e => e.ContentType).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_DocumentiDipendenti_CreatedAt");
+            entity.Property(e => e.DimensioneBytes).HasDefaultValue(0L, "DF_DocumentiDipendenti_DimensioneBytes");
             entity.Property(e => e.Estensione).HasMaxLength(20);
             entity.Property(e => e.NomeFile).HasMaxLength(255);
+            entity.Property(e => e.NomeFileSalvato).HasMaxLength(255);
             entity.Property(e => e.Note).HasMaxLength(1000);
             entity.Property(e => e.PercorsoFile).HasMaxLength(500);
+
+            entity.HasOne(d => d.Cartella).WithMany(p => p.DocumentiDipendentis)
+                .HasForeignKey(d => d.CartellaId)
+                .HasConstraintName("FK_DocumentiDipendenti_Cartelle");
 
             entity.HasOne(d => d.Dipendente).WithMany(p => p.DocumentiDipendentis)
                 .HasForeignKey(d => d.DipendenteId)
@@ -296,6 +419,10 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.TipoDocumento).WithMany(p => p.DocumentiDipendentis)
                 .HasForeignKey(d => d.TipoDocumentoId)
                 .HasConstraintName("FK_DocumentiDipendenti_TipiDocumento");
+
+            entity.HasOne(d => d.UploadedByUtente).WithMany(p => p.DocumentiDipendentiUploadedByUtentes)
+                .HasForeignKey(d => d.UploadedByUtenteId)
+                .HasConstraintName("FK_DocumentiDipendenti_Utenti_UploadedBy");
         });
 
         modelBuilder.Entity<DocumentiMezzi>(entity =>
@@ -350,6 +477,13 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Modello).HasMaxLength(100);
             entity.Property(e => e.Nome).HasMaxLength(150);
             entity.Property(e => e.Note).HasMaxLength(1000);
+            entity.Property(e => e.QuantitaDisponibile)
+                .HasColumnType("decimal(18, 2)")
+                .HasDefaultValue(0);
+            entity.Property(e => e.QuantitaMinima)
+                .HasColumnType("decimal(18, 2)")
+                .HasDefaultValue(0);
+            entity.Property(e => e.RichiedeTaglia).HasDefaultValue(false);
             entity.Property(e => e.Taglia).HasMaxLength(50);
 
             entity.HasOne(d => d.CategoriaDpi).WithMany(p => p.Dpis)
@@ -399,6 +533,48 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Telefono).HasMaxLength(50);
         });
 
+        modelBuilder.Entity<ExpenseRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_ExpenseRequests");
+
+            entity.ToTable("ExpenseRequests");
+
+            entity.HasIndex(e => e.DipendenteId, "IX_ExpenseRequests_DipendenteId");
+            entity.HasIndex(e => e.Stato, "IX_ExpenseRequests_Stato");
+            entity.HasIndex(e => e.CreatedAt, "IX_ExpenseRequests_CreatedAt");
+            entity.HasIndex(e => e.GestitoDaUtenteId, "IX_ExpenseRequests_GestitoDaUtenteId");
+
+            entity.Property(e => e.CategoriaSpesa).HasMaxLength(150);
+            entity.Property(e => e.Descrizione).HasMaxLength(1000);
+            entity.Property(e => e.Importo).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Valuta).HasMaxLength(3);
+            entity.Property(e => e.MetodoPagamento).HasMaxLength(100);
+            entity.Property(e => e.Stato)
+                .HasMaxLength(30)
+                .HasDefaultValue(RequestStatusCodes.InAttesa, "DF_ExpenseRequests_Stato");
+            entity.Property(e => e.AllegatoNomeFile).HasMaxLength(255);
+            entity.Property(e => e.AllegatoPercorsoFile).HasMaxLength(500);
+            entity.Property(e => e.AllegatoContentType).HasMaxLength(100);
+            entity.Property(e => e.AllegatoEstensione).HasMaxLength(20);
+            entity.Property(e => e.NotaGestione).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())", "DF_ExpenseRequests_CreatedAt");
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_ExpenseRequests_Importo", "[Importo] > 0");
+                t.HasCheckConstraint("CK_ExpenseRequests_Stato", "[Stato] IN (N'IN_ATTESA', N'APPROVATA', N'RIFIUTATA', N'IN_REVISIONE')");
+            });
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.ExpenseRequests)
+                .HasForeignKey(d => d.DipendenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ExpenseRequests_Dipendenti");
+
+            entity.HasOne(d => d.GestitoDaUtente).WithMany(p => p.ExpenseRequestsGestite)
+                .HasForeignKey(d => d.GestitoDaUtenteId)
+                .HasConstraintName("FK_ExpenseRequests_Utenti_GestitoDa");
+        });
+
         modelBuilder.Entity<Mansioni>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Mansioni__3214EC0711E4A07C");
@@ -411,6 +587,44 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_Mansioni_CreatedAt");
             entity.Property(e => e.Descrizione).HasMaxLength(255);
             entity.Property(e => e.Nome).HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<IssueReport>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_IssueReports");
+
+            entity.ToTable("IssueReports");
+
+            entity.HasIndex(e => e.DipendenteId, "IX_IssueReports_DipendenteId");
+            entity.HasIndex(e => e.Stato, "IX_IssueReports_Stato");
+            entity.HasIndex(e => e.CreatedAt, "IX_IssueReports_CreatedAt");
+            entity.HasIndex(e => e.GestitoDaUtenteId, "IX_IssueReports_GestitoDaUtenteId");
+
+            entity.Property(e => e.Categoria).HasMaxLength(100);
+            entity.Property(e => e.Oggetto).HasMaxLength(200);
+            entity.Property(e => e.Luogo).HasMaxLength(200);
+            entity.Property(e => e.Descrizione).HasMaxLength(1000);
+            entity.Property(e => e.Priorita).HasMaxLength(30);
+            entity.Property(e => e.Note).HasMaxLength(1000);
+            entity.Property(e => e.Stato)
+                .HasMaxLength(30)
+                .HasDefaultValue(RequestStatusCodes.InAttesa, "DF_IssueReports_Stato");
+            entity.Property(e => e.NotaGestione).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())", "DF_IssueReports_CreatedAt");
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_IssueReports_Stato", "[Stato] IN (N'IN_ATTESA', N'APPROVATA', N'RIFIUTATA', N'IN_REVISIONE')");
+            });
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.IssueReports)
+                .HasForeignKey(d => d.DipendenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IssueReports_Dipendenti");
+
+            entity.HasOne(d => d.GestitoDaUtente).WithMany(p => p.IssueReportsGestite)
+                .HasForeignKey(d => d.GestitoDaUtenteId)
+                .HasConstraintName("FK_IssueReports_Utenti_GestitoDa");
         });
 
         modelBuilder.Entity<Materiali>(entity =>
@@ -449,6 +663,44 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_Materiali_Fornitori");
         });
 
+        modelBuilder.Entity<MaterialRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_MaterialRequests");
+
+            entity.ToTable("MaterialRequests");
+
+            entity.HasIndex(e => e.DipendenteId, "IX_MaterialRequests_DipendenteId");
+            entity.HasIndex(e => e.Stato, "IX_MaterialRequests_Stato");
+            entity.HasIndex(e => e.CreatedAt, "IX_MaterialRequests_CreatedAt");
+            entity.HasIndex(e => e.GestitoDaUtenteId, "IX_MaterialRequests_GestitoDaUtenteId");
+
+            entity.Property(e => e.MaterialeRichiesto).HasMaxLength(200);
+            entity.Property(e => e.Quantita).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Motivazione).HasMaxLength(1000);
+            entity.Property(e => e.Priorita).HasMaxLength(30);
+            entity.Property(e => e.Note).HasMaxLength(1000);
+            entity.Property(e => e.Stato)
+                .HasMaxLength(30)
+                .HasDefaultValue(RequestStatusCodes.InAttesa, "DF_MaterialRequests_Stato");
+            entity.Property(e => e.NotaGestione).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())", "DF_MaterialRequests_CreatedAt");
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_MaterialRequests_Quantita", "[Quantita] > 0");
+                t.HasCheckConstraint("CK_MaterialRequests_Stato", "[Stato] IN (N'IN_ATTESA', N'APPROVATA', N'RIFIUTATA', N'IN_REVISIONE')");
+            });
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.MaterialRequests)
+                .HasForeignKey(d => d.DipendenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaterialRequests_Dipendenti");
+
+            entity.HasOne(d => d.GestitoDaUtente).WithMany(p => p.MaterialRequestsGestite)
+                .HasForeignKey(d => d.GestitoDaUtenteId)
+                .HasConstraintName("FK_MaterialRequests_Utenti_GestitoDa");
+        });
+
         modelBuilder.Entity<Mezzi>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Mezzi__3214EC07B3567637");
@@ -479,6 +731,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Note).HasMaxLength(1000);
             entity.Property(e => e.NumeroTelaio).HasMaxLength(100);
             entity.Property(e => e.Targa).HasMaxLength(20);
+            entity.Property(e => e.TipoPossesso).HasMaxLength(20);
 
             entity.HasOne(d => d.Fornitore).WithMany(p => p.Mezzis)
                 .HasForeignKey(d => d.FornitoreId)
@@ -524,6 +777,43 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_MovimentiMateriale_TipiMovimentoMateriale");
         });
 
+        modelBuilder.Entity<Permessi>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Permessi__3214EC07A0B017E1");
+
+            entity.ToTable("Permessi");
+
+            entity.HasIndex(e => e.Codice, "UX_Permessi_Codice").IsUnique();
+
+            entity.Property(e => e.Azione).HasMaxLength(100);
+            entity.Property(e => e.Attivo).HasDefaultValue(true, "DF_Permessi_Attivo");
+            entity.Property(e => e.Codice).HasMaxLength(150);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_Permessi_CreatedAt");
+            entity.Property(e => e.Descrizione).HasMaxLength(255);
+            entity.Property(e => e.Risorsa).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<RefreshTokens>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC078E3ABF53");
+
+            entity.ToTable("RefreshTokens");
+
+            entity.HasIndex(e => e.TokenHash, "UX_RefreshTokens_TokenHash").IsUnique();
+
+            entity.HasIndex(e => new { e.UtenteId, e.ExpiresAt }, "IX_RefreshTokens_UtenteId_ExpiresAt");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_RefreshTokens_CreatedAt");
+            entity.Property(e => e.CreatedByIp).HasMaxLength(100);
+            entity.Property(e => e.TokenHash).HasMaxLength(500);
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+
+            entity.HasOne(d => d.Utente).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UtenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RefreshTokens_Utenti");
+        });
+
         modelBuilder.Entity<Ruoli>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Ruoli__3214EC0763C9D54C");
@@ -538,6 +828,25 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Nome).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<RuoliPermessi>(entity =>
+        {
+            entity.HasKey(e => new { e.RuoloId, e.PermessoId });
+
+            entity.ToTable("RuoliPermessi");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_RuoliPermessi_CreatedAt");
+
+            entity.HasOne(d => d.Permesso).WithMany(p => p.RuoliPermessis)
+                .HasForeignKey(d => d.PermessoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RuoliPermessi_Permessi");
+
+            entity.HasOne(d => d.Ruolo).WithMany(p => p.RuoliPermessis)
+                .HasForeignKey(d => d.RuoloId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RuoliPermessi_Ruoli");
+        });
+
         modelBuilder.Entity<StatiAssegnazione>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__StatiAss__3214EC07CE1ACDDF");
@@ -548,6 +857,18 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Attivo).HasDefaultValue(true, "DF_StatiAssegnazione_Attivo");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_StatiAssegnazione_CreatedAt");
+            entity.Property(e => e.Descrizione).HasMaxLength(255);
+            entity.Property(e => e.Nome).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TipoAssenza>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_TipiAssenza");
+
+            entity.ToTable("TipiAssenza");
+
+            entity.Property(e => e.Attivo).HasDefaultValue(true, "DF_TipiAssenza_Attivo");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())", "DF_TipiAssenza_CreatedAt");
             entity.Property(e => e.Descrizione).HasMaxLength(255);
             entity.Property(e => e.Nome).HasMaxLength(100);
         });
@@ -614,6 +935,10 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("Utenti");
 
+            entity.HasIndex(e => e.DipendenteId, "UX_Utenti_DipendenteId")
+                .IsUnique()
+                .HasFilter("([DipendenteId] IS NOT NULL)");
+
             entity.HasIndex(e => e.Email, "UX_Utenti_Email").IsUnique();
 
             entity.HasIndex(e => e.Username, "UX_Utenti_Username").IsUnique();
@@ -622,16 +947,23 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Cognome).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_Utenti_CreatedAt");
             entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.MustChangePassword).HasDefaultValue(true, "DF_Utenti_MustChangePassword");
             entity.Property(e => e.Nome).HasMaxLength(100);
             entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.Username).HasMaxLength(100);
+
+            entity.HasOne(d => d.Dipendente).WithMany(p => p.Utentis)
+                .HasForeignKey(d => d.DipendenteId)
+                .HasConstraintName("FK_Utenti_Dipendenti");
         });
 
         modelBuilder.Entity<UtentiRuoli>(entity =>
         {
-            entity.HasKey(e => new { e.UtenteId, e.RuoloId });
+            entity.HasKey(e => e.Id).HasName("PK_UtentiRuoli");
 
             entity.ToTable("UtentiRuoli");
+
+            entity.HasIndex(e => new { e.UtenteId, e.RuoloId }, "UX_UtentiRuoli_UtenteId_RuoloId").IsUnique();
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_UtentiRuoli_CreatedAt");
 
@@ -644,6 +976,28 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.UtenteId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UtentiRuoli_Utenti");
+        });
+
+        modelBuilder.Entity<UtentiVisibilita>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_UtentiVisibilita");
+
+            entity.ToTable("UtentiVisibilita");
+
+            entity.HasIndex(e => new { e.UtenteId, e.Chiave }, "UX_UtentiVisibilita_UtenteId_Chiave").IsUnique();
+
+            entity.Property(e => e.Chiave).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())", "DF_UtentiVisibilita_CreatedAt");
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_UtentiVisibilita_Chiave", "[Chiave] IN (N'dashboard', N'dipendenti', N'magazzino', N'attrezzature', N'dpi', N'mezzi', N'cantieri', N'segreteria')");
+            });
+
+            entity.HasOne(d => d.Utente).WithMany(p => p.UtentiVisibilitas)
+                .HasForeignKey(d => d.UtenteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UtentiVisibilita_Utenti");
         });
 
         modelBuilder.Entity<VisiteMediche>(entity =>

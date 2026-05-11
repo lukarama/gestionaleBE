@@ -9,10 +9,34 @@ namespace Gestionale.Api.Controllers;
 public class MagazzinoController : ControllerBase
 {
     private readonly IMagazzinoService _service;
+    private readonly IImportazioniMagazzinoService _importazioniService;
 
-    public MagazzinoController(IMagazzinoService service)
+    public MagazzinoController(IMagazzinoService service, IImportazioniMagazzinoService importazioniService)
     {
         _service = service;
+        _importazioniService = importazioniService;
+    }
+
+    [HttpPost("import-excel/preview")]
+    public async Task<IActionResult> PreviewImportExcel([FromForm] UploadImportMovimentiMagazzinoDto dto)
+    {
+        var result = await _importazioniService.CreaAnteprimaAsync(dto);
+
+        if (!result.Success)
+            return StatusCode(result.StatusCode ?? 400, result);
+
+        return Ok(result);
+    }
+
+    [HttpPost("import-excel/confirm")]
+    public async Task<IActionResult> ConfermaImportExcel([FromBody] ConfermaImportMovimentiMagazzinoDto dto)
+    {
+        var result = await _importazioniService.ConfermaImportazioneAsync(dto);
+
+        if (!result.Success)
+            return StatusCode(result.StatusCode ?? 400, result);
+
+        return Ok(result);
     }
 
     [HttpPost("prelievo")]
